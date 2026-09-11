@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sydney Nightlife Accessibility Simulator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --highlight: #22c55e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 2rem 1rem; display: flex; justify-content: center; }
+    .container { max-width: 900px; width: 100%; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--accent); }
+    p.subtitle { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem; }
+    
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 0.4rem; font-weight: 600; }
+    select { width: 100%; padding: 0.75rem; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; outline: none; }
+    select:focus { border-color: var(--accent); }
+
+    .pipeline { display: flex; justify-content: space-between; align-items: center; position: relative; margin: 2rem 0; }
+    .pipeline::before { content: ""; position: absolute; top: 50%; left: 5%; right: 5%; height: 2px; background: var(--border); z-index: 1; transform: translateY(-50%); }
+    .node { position: relative; z-index: 2; background: #0f172a; border: 2px solid var(--border); border-radius: 50%; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.3s ease; }
+    .node.active { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 15px var(--accent); }
+    .node-label { position: absolute; top: 60px; font-size: 0.75rem; text-align: center; width: 90px; left: 50%; transform: translateX(-50%); color: var(--text-muted); }
+
+    .grid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 3.5rem; }
+    .card { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
+    .card h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; letter-spacing: 0.05em; }
+    .card p { font-size: 0.95rem; line-height: 1.4; color: var(--text); }
+    .badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: rgba(34, 197, 94, 0.15); color: var(--highlight); margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Sydney Nightlife Accessibility Architecture</h1>
+  <p class="subtitle">Interactive End-to-End System Simulation & Payload Model</p>
+
+  <div class="controls">
+    <div>
+      <label for="profileSelect">Accessibility Profile</label>
+      <select id="profileSelect">
+        <option value="blind">Visually Impaired</option>
+        <option value="deaf">Deaf / Hard of Hearing</option>
+        <option value="nonverbal">Non-Verbal / Speech Impaired</option>
+        <option value="mobility">Mobility / Wheelchair</option>
+        <option value="sensory">Neurodivergent / Sensory Sensitive</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="stageSelect">Journey Stage</label>
+      <select id="stageSelect">
+        <option value="transit">1. Transit Arrival (Light Rail / Train)</option>
+        <option value="crossing">2. Street Crossing (George St PB/5)</option>
+        <option value="entry">3. Venue Entry (Club / Bar)</option>
+        <option value="sos">4. SOS / Emergency Escalation</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="node active" id="node-env">📍<span class="node-label">Physical Sensor</span></div>
+    <div class="node active" id="node-client">📱<span class="node-label">Companion Fob/App</span></div>
+    <div class="node active" id="node-server">☁️<span class="node-label">MQTT Gateway</span></div>
+    <div class="node active" id="node-staff">🚨<span class="node-label">Staff Terminal</span></div>
+  </div>
+
+  <div class="grid-cards">
+    <div class="card">
+      <span class="badge" id="badge-trigger">INPUT SENSOR</span>
+      <h3>Trigger Mechanism</h3>
+      <p id="desc-trigger">Detecting BLE Beacon RSSI proximity.</p>
+    </div>
+    <div class="card">
+      <span class="badge" id="badge-feedback">USER RECEIVES</span>
+      <h3>Feedback Loop</h3>
+      <p id="desc-feedback">Spatial bone-conduction voice guidance.</p>
+    </div>
+    <div class="card">
+      <span class="badge" id="badge-dispatch">DISPATCH PAYLOAD</span>
+      <h3>Staff / Authority Action</h3>
+      <p id="desc-dispatch">No active alert; background route tracking active.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const scenarioMatrix = {
+    blind: {
+      transit: {
+        trigger: "Ambient BLE beacon detected at station exit (5m radius)",
+        feedback: "Bone-conduction spatial audio: 'Light rail platform clear. Concourse stairs 4m to your 2 o'clock.'",
+        dispatch: "Passive logging. Zero alarm fatigue — no staff ping required."
+      },
+      crossing: {
+        trigger: "Proximity match to intersection PB/5 tactile signal",
+        feedback: "Distinct directional haptic pulse confirming ped-crossing cycle requested.",
+        dispatch: "Traffic Management Centre: Walk phase hold requested automatically."
+      },
+      entry: {
+        trigger: "Intentional high-contrast NFC card tap at venue entry counter",
+        feedback: "Short confirming chime + wrist buzz.",
+        dispatch: "Host Tablet Alert: 'Guest with low vision arriving. Provide step guidance past strobe corridor.'"
+      },
+      sos: {
+        trigger: "2-second physical push-button hold on tactile keyfob",
+        feedback: "Continuous slow haptic pulse confirming SOS transmitted; phone line opens.",
+        dispatch: "NSW Emergency Services / Safe Space: Indoor Beacon ID + GPS + Accessibility Token: 'Blind patron needs urgent navigation assist.'"
+      }
+    },
+    deaf: {
+      transit: {
+        trigger: "Geofence ping via transit BLE beacon",
+        feedback: "Double haptic buzz + high-contrast visual display card showing station exit directions.",
+        dispatch: "Passive routing log."
+      },
+      crossing: {
+        trigger: "Intersection beacon detection",
+        feedback: "Screen flashes bright green pulse when walk cycle goes live.",
+        dispatch: "Traffic cycle logged."
+      },
+      entry: {
+        trigger: "NFC tap on venue door scanner",
+        feedback: "Vibration confirmation; digital venue map loaded.",
+        dispatch: "Door Security Screen: 'Guest is Deaf. Use visual board/text for ticketing; do not shout.'"
+      },
+      sos: {
+        trigger: "Fob button emergency squeeze",
+        feedback: "Screen displays silent SOS strobe + real-time SMS chat interface with local responders.",
+        dispatch: "Terminal Alert: 'Deaf guest in distress. Respond via text or on-foot visual hail.'"
+      }
+    },
+    nonverbal: {
+      transit: {
+        trigger: "Transit beacon connection",
+        feedback: "Pre-configured rapid phrase cards queued on home screen.",
+        dispatch: "System stand-by."
+      },
+      crossing: {
+        trigger: "Automated PB/5 proximity link",
+        feedback: "Visual countdown timer shown on device lock screen.",
+        dispatch: "Crossing cycle initiated."
+      },
+      entry: {
+        trigger: "NFC tap at bar or ticketing counter",
+        feedback: "Companion screen pops up primary communication board (e.g., 'Ticket on app', 'Water', 'Exit').",
+        dispatch: "Counter POS terminal: 'Patron is non-verbal. Please read user display.'"
+      },
+      sos: {
+        trigger: "Quick triple-tap on fob",
+        feedback: "Device confirms SOS broadcast silently.",
+        dispatch: "Venue Security: 'Non-verbal guest distress beacon active at Section B bar. In-person check required.'"
+      }
+    },
+    mobility: {
+      transit: {
+        trigger: "Platform BLE beacon handshake",
+        feedback: "Route recalculation avoiding stairs; live lift operational status displayed.",
+        dispatch: "Station attendant tablet: 'Step-free transit patron on platform.'"
+      },
+      crossing: {
+        trigger: "Smart crossing zone auto-trigger",
+        feedback: "Haptic notification: 'Pedestrian walk extended by 8 seconds.'",
+        dispatch: "TMC signal delay extended for wheelchair crossing clearance."
+      },
+      entry: {
+        trigger: "NFC tap at external threshold tag",
+        feedback: "Screen notice: 'Ramp assistance requested.'",
+        dispatch: "Door Host: 'Wheelchair patron at George St entrance. Deploy side ramp.'"
+      },
+      sos: {
+        trigger: "Fob SOS trigger",
+        feedback: "Visual and haptic transmission acknowledgment.",
+        dispatch: "Emergency Dispatch: 'Mobility impaired user stranded. Require wheelchair-accessible extraction unit.'"
+      }
+    },
+    sensory: {
+      transit: {
+        trigger: "Transit concourse beacon",
+        feedback: "Low-stimulation UI activates; routes through lowest-decibel exit corridors.",
+        dispatch: "Passive routing log."
+      },
+      crossing: {
+        trigger: "PB/5 proximity zone",
+        feedback: "Muted gentle haptic prompt (sound muted to prevent sensory overload).",
+        dispatch: "Standard ped cycle."
+      },
+      entry: {
+        trigger: "Fob NFC tap at venue gate",
+        feedback: "Phone displays venue quiet-zone map and chillout room access pin.",
+        dispatch: "Host Screen: 'Sensory-sensitive patron. Direct immediately to quiet zone / bypass main queue.'"
+      },
+      sos: {
+        trigger: "De-escalation long-press",
+        feedback: "Calming visual pulse with guided breathing exercise; all device sounds muted.",
+        dispatch: "Venue Care Team: 'Patron experiencing sensory overload in main hall. Send peer escort to guide to quiet room.'"
+      }
+    }
+  };
+
+  const profileSelect = document.getElementById("profileSelect");
+  const stageSelect = document.getElementById("stageSelect");
+  const descTrigger = document.getElementById("desc-trigger");
+  const descFeedback = document.getElementById("desc-feedback");
+  const descDispatch = document.getElementById("desc-dispatch");
+
+  function updateView() {
+    const profile = profileSelect.value;
+    const stage = stageSelect.value;
+    const data = scenarioMatrix[profile][stage];
+
+    descTrigger.textContent = data.trigger;
+    descFeedback.textContent = data.feedback;
+    descDispatch.textContent = data.dispatch;
+  }
+
+  profileSelect.addEventListener("change", updateView);
+  stageSelect.addEventListener("change", updateView);
+  updateView();
+</script>
+</body>
+</html>
