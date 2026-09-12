@@ -19,7 +19,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 2rem 1rem; display: flex; justify-content: center; }
-    .container { max-width: 960px; width: 100%; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .container { max-width: 980px; width: 100%; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     h1 { font-size: 1.5rem; margin-bottom: 0.3rem; color: var(--accent); }
     p.subtitle { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem; }
     
@@ -35,6 +35,420 @@
     .node.bus-active { border-color: var(--bus-accent); background: var(--bus-glow); box-shadow: 0 0 15px var(--bus-accent); }
     .node-label { position: absolute; top: 64px; font-size: 0.75rem; text-align: center; width: 100px; left: 50%; transform: translateX(-50%); color: var(--text-muted); font-weight: 500; }
 
+    .grid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 3.5rem; }
+    .card { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
+    .card h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; letter-spacing: 0.05em; }
+    .card p { font-size: 0.92rem; line-height: 1.45; color: var(--text); }
+    .badge { display: inline-block; padding: 0.25rem 0.55rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: rgba(34, 197, 94, 0.15); color: var(--highlight); margin-bottom: 0.5rem; }
+    .badge.bus { background: rgba(245, 158, 11, 0.15); color: var(--bus-accent); }
+
+    /* Interactive Mechanical Canvas & Kinematics */
+    .mechanical-spec { display: none; margin-top: 2rem; background: #0b1120; border: 1px solid var(--bus-accent); border-radius: 8px; padding: 1.5rem; }
+    .mechanical-spec.visible { display: block; }
+    .spec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.6rem; }
+    .spec-header h4 { font-size: 0.95rem; text-transform: uppercase; color: var(--bus-accent); letter-spacing: 0.05em; }
+    
+    .sim-controls { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+    .sim-btn { background: var(--bus-accent); color: #000; font-weight: 700; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: opacity 0.2s; }
+    .sim-btn:hover { opacity: 0.9; }
+
+    .ramp-canvas { width: 100%; height: 180px; background: #030712; border: 1px solid #1e293b; border-radius: 6px; position: relative; overflow: hidden; margin-bottom: 1.2rem; }
+    svg { width: 100%; height: 100%; }
+
+    .spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; font-size: 0.82rem; }
+    .spec-item { background: #1e293b; padding: 0.6rem; border-radius: 6px; border: 1px solid var(--border); }
+    .spec-item strong { display: block; color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .spec-item span { color: var(--text); font-weight: 600; }
+    .kinematic-status { margin-top: 1rem; font-size: 0.85rem; color: #cbd5e1; line-height: 1.5; background: #0f172a; padding: 0.8rem; border-radius: 6px; border-left: 3px solid var(--bus-accent); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Sydney Nightlife & Transit Accessibility Simulator</h1>
+  <p class="subtitle">Real-Time Sensor Pipeline, IoT Cloud Dispatch & Automated Kinematic Bus Ramp</p>
+
+  <div class="controls">
+    <div>
+      <label for="profileSelect">Accessibility Profile</label>
+      <select id="profileSelect">
+        <option value="mobility">Mobility / Wheelchair</option>
+        <option value="blind">Visually Impaired</option>
+        <option value="deaf">Deaf / Hard of Hearing</option>
+        <option value="nonverbal">Non-Verbal / Speech Impaired</option>
+        <option value="sensory">Neurodivergent / Sensory Sensitive</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="stageSelect">Journey Stage</label>
+      <select id="stageSelect">
+        <option value="bus_ramp">🚌 Bus Boarding (Automated Kinematic Ramp)</option>
+        <option value="transit">1. Transit Arrival (Light Rail / Train)</option>
+        <option value="crossing">2. Street Crossing (George St PB/5)</option>
+        <option value="entry">3. Venue Entry (Club / Bar)</option>
+        <option value="sos">4. SOS / Emergency Escalation</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="pipeline">
+    <div class="node active" id="node-env">📍<span class="node-label">Physical Sensor</span></div>
+    <div class="node active" id="node-client">📱<span class="node-label">Companion Fob/App</span></div>
+    <div class="node active" id="node-server">☁️<span class="node-label">MQTT Gateway</span></div>
+    <div class="node active" id="node-staff">🚨<span class="node-label">Staff / Driver HUD</span></div>
+  </div>
+
+  <div class="grid-cards">
+    <div class="card">
+      <span class="badge" id="badge-trigger">INPUT SENSOR</span>
+      <h3>Trigger Mechanism</h3>
+      <p id="desc-trigger">Loading...</p>
+    </div>
+    <div class="card">
+      <span class="badge" id="badge-feedback">USER RECEIVES</span>
+      <h3>Feedback Loop</h3>
+      <p id="desc-feedback">Loading...</p>
+    </div>
+    <div class="card">
+      <span class="badge" id="badge-dispatch">DISPATCH PAYLOAD</span>
+      <h3>Staff / Vehicle Action</h3>
+      <p id="desc-dispatch">Loading...</p>
+    </div>
+  </div>
+
+  <!-- Interactive Kinematic Ramp Visualization -->
+  <div class="mechanical-spec" id="mechanicalSpec">
+    <div class="spec-header">
+      <h4>Kinematic Actuation Schematic (Two-Stage Deployment)</h4>
+      <span class="badge bus" id="kinematicState">STATE: STOWED (IN CAVITY)</span>
+    </div>
+
+    <div class="sim-controls">
+      <button class="sim-btn" id="btnToggleRamp" onclick="toggleRampSimulation()">Cycle Deployment Test</button>
+      <span id="interlockLabel" style="font-size: 0.8rem; color: #94a3b8;">Interlock Status: Ready</span>
+    </div>
+
+    <!-- Live SVG Engineering Visualizer -->
+    <div class="ramp-canvas">
+      <svg viewBox="0 0 800 180" id="rampSvg">
+        <!-- Footpath & Kerb -->
+        <rect x="50" y="120" width="220" height="60" fill="#334155" />
+        <text x="70" y="145" fill="#94a3b8" font-size="12" font-weight="bold">FOOTPATH (KERB)</text>
+        <line x1="270" y1="120" x2="270" y2="180" stroke="#64748b" stroke-width="2" stroke-dasharray="4" />
+
+        <!-- Road Gap -->
+        <rect x="270" y="165" width="220" height="15" fill="#020617" />
+        <text x="330" y="176" fill="#475569" font-size="10">GAP SPAN: 1.2m</text>
+
+        <!-- Bus Chassis Profile -->
+        <rect x="490" y="70" width="300" height="110" fill="#1e293b" stroke="#475569" stroke-width="2" />
+        <rect x="490" y="90" width="130" height="18" fill="#0b1120" /> <!-- Floor Cavity -->
+        <text x="630" y="110" fill="#f59e0b" font-size="14" font-weight="bold">BUS FRONT DOOR (850mm)</text>
+        <text x="630" y="130" fill="#94a3b8" font-size="11">Floor Height: 200mm (Knelt)</text>
+
+        <!-- Dynamic Mechanical Kinematic Group -->
+        <!-- Fixed End & Electric Linear Actuator -->
+        <rect x="580" y="93" width="30" height="12" fill="#ef4444" id="elecActuator" />
+        <text x="560" y="85" fill="#ef4444" font-size="10">24V Linear Actuator</text>
+
+        <!-- Retractable Lower Face / Carriage -->
+        <g id="retractableCarriage" transform="translate(0, 0)" style="transition: transform 1.2s ease-in-out;">
+          <rect x="470" y="94" width="120" height="10" fill="#38bdf8" />
+          <circle cx="470" cy="99" r="4" fill="#f59e0b" id="hingePoint" /> <!-- Hinge -->
+
+          <!-- Hinged Upper Face (Descends via Hydraulic Extension) -->
+          <g id="hingedUpperPlate" transform="rotate(0, 470, 99)" style="transition: transform 1s ease-in-out;">
+            <line x1="470" y1="99" x2="270" y2="99" stroke="#22c55e" stroke-width="7" stroke-linecap="round" id="rampPlate" />
+            <!-- Hydraulic Ram Graphic -->
+            <line x1="470" y1="104" x2="370" y2="104" stroke="#f59e0b" stroke-width="3" id="hydroRam" />
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="spec-grid">
+      <div class="spec-item">
+        <strong>Clearance Geometry</strong>
+        <span>Door: 850mm | Ramp: 800mm (25mm margin/side)</span>
+      </div>
+      <div class="spec-item">
+        <strong>Span & Gradient</strong>
+        <span>Span: 1.2m | Net Rise: ~180mm (~8.5° slope)</span>
+      </div>
+      <div class="spec-item">
+        <strong>Structural Payload</strong>
+        <span>Rated: 300kg (Dynamic: 420-600kg @ 1.4-2.0x)</span>
+      </div>
+      <div class="spec-item">
+        <strong>Actuation Division</strong>
+        <span>Electric Linear + Bottom Hydraulic Ram</span>
+      </div>
+    </div>
+    
+    <p class="kinematic-status" id="kinematicDesc">
+      • <strong>Stage 1 (Linear Stroke):</strong> 24V electric linear actuator slides the 800mm-wide cassette outward from the bus sub-floor cavity.<br>
+      • <strong>Stage 2 (Angular Descent):</strong> Bottom hydraulic ram articulates the hinge, lowering the 1.2m plate until ground contact is confirmed.<br>
+      • <strong>Safety Interlock:</strong> Bus kneeling active. Air brakes locked; engine throttle locked out via CAN bus.
+    </p>
+  </div>
+</div>
+
+<script>
+  const scenarioMatrix = {
+    mobility: {
+      bus_ramp: {
+        isBus: true,
+        trigger: "User presses tactile Fob or taps Bus Stop NFC pole as bus kneels",
+        feedback: "Haptic pulse + voice alert: 'Bus kneeling. Motorized 1.2m ramp extending (300kg rated). Keep clear 1.5m.'",
+        dispatch: "Bus Driver Telemetry HUD: 'Auto-Ramp deployed (800mm width / 1.2m span). Interlock active: Throttle inhibited. Ground pressure switch confirmed on footpath.'"
+      },
+      transit: {
+        isBus: false,
+        trigger: "Platform BLE beacon handshake",
+        feedback: "Route recalculation avoiding stairs; live lift operational status displayed.",
+        dispatch: "Station attendant tablet: 'Step-free transit patron on platform.'"
+      },
+      crossing: {
+        isBus: false,
+        trigger: "Smart crossing zone auto-trigger",
+        feedback: "Haptic notification: 'Pedestrian walk extended by 8 seconds.'",
+        dispatch: "TMC signal delay extended for wheelchair crossing clearance."
+      },
+      entry: {
+        isBus: false,
+        trigger: "NFC tap at external threshold tag",
+        feedback: "Screen notice: 'Ramp assistance requested.'",
+        dispatch: "Door Host: 'Wheelchair patron at George St entrance. Deploy side ramp.'"
+      },
+      sos: {
+        isBus: false,
+        trigger: "Fob SOS trigger",
+        feedback: "Visual and haptic transmission acknowledgment.",
+        dispatch: "Emergency Dispatch: 'Mobility impaired user stranded. Require wheelchair-accessible extraction unit.'"
+      }
+    },
+    blind: {
+      bus_ramp: {
+        isBus: true,
+        trigger: "Exterior bus BLE beacon detected + single press on pocket fob",
+        feedback: "Bone-conduction spatial audio: 'Route 333 knelt. 1.2m ramp deployed at front 850mm door. Acoustic locator ping active at ramp tip.'",
+        dispatch: "Driver HUD: 'Visually impaired passenger boarding. Ramp deployed; keep vehicle stationary until passenger is seated.'"
+      },
+      transit: {
+        isBus: false,
+        trigger: "Ambient BLE beacon detected at station exit (5m radius)",
+        feedback: "Bone-conduction spatial audio: 'Light rail platform clear. Concourse stairs 4m to your 2 o'clock.'",
+        dispatch: "Passive logging. Zero alarm fatigue — no staff ping required."
+      },
+      crossing: {
+        isBus: false,
+        trigger: "Proximity match to intersection PB/5 tactile signal",
+        feedback: "Distinct directional haptic pulse confirming ped-crossing cycle requested.",
+        dispatch: "Traffic Management Centre: Walk phase hold requested automatically."
+      },
+      entry: {
+        isBus: false,
+        trigger: "Intentional high-contrast NFC card tap at venue entry counter",
+        feedback: "Short confirming chime + wrist buzz.",
+        dispatch: "Host Tablet Alert: 'Guest with low vision arriving. Provide step guidance past strobe corridor.'"
+      },
+      sos: {
+        isBus: false,
+        trigger: "2-second physical push-button hold on tactile keyfob",
+        feedback: "Continuous slow haptic pulse confirming SOS transmitted; phone line opens.",
+        dispatch: "NSW Emergency Services / Safe Space: Indoor Beacon ID + GPS: 'Blind patron needs urgent navigation assist.'"
+      }
+    },
+    deaf: {
+      bus_ramp: {
+        isBus: true,
+        trigger: "Tap card on bus stop beacon post",
+        feedback: "High-contrast phone alert + bus exterior LED strips pulse green: 'Automated ramp extended across footpath. Safe to board.'",
+        dispatch: "Driver Console: 'Deaf customer boarding via automatic ramp. Visual floor indicators lit.'"
+      },
+      transit: {
+        isBus: false,
+        trigger: "Geofence ping via transit BLE beacon",
+        feedback: "Double haptic buzz + high-contrast visual display card showing station exit directions.",
+        dispatch: "Passive routing log."
+      },
+      crossing: {
+        isBus: false,
+        trigger: "Intersection beacon detection",
+        feedback: "Screen flashes bright green pulse when walk cycle goes live.",
+        dispatch: "Traffic cycle logged."
+      },
+      entry: {
+        isBus: false,
+        trigger: "NFC tap on venue door scanner",
+        feedback: "Vibration confirmation; digital venue map loaded.",
+        dispatch: "Door Security Screen: 'Guest is Deaf. Use visual board/text for ticketing; do not shout.'"
+      },
+      sos: {
+        isBus: false,
+        trigger: "Fob button emergency squeeze",
+        feedback: "Screen displays silent SOS strobe + real-time SMS chat interface with local responders.",
+        dispatch: "Terminal Alert: 'Deaf guest in distress. Respond via text or on-foot visual hail.'"
+      }
+    },
+    nonverbal: {
+      bus_ramp: {
+        isBus: true,
+        trigger: "App quick-action button 'Board Bus with Ramp'",
+        feedback: "Screen loads destination card and confirms: 'Ramp requested. Driver notified.'",
+        dispatch: "Driver Console: 'Non-verbal passenger boarding via ramp. Fare destination pre-routed on terminal.'"
+      },
+      transit: {
+        isBus: false,
+        trigger: "Transit beacon connection",
+        feedback: "Pre-configured rapid phrase cards queued on home screen.",
+        dispatch: "System stand-by."
+      },
+      crossing: {
+        isBus: false,
+        trigger: "Automated PB/5 proximity link",
+        feedback: "Visual countdown timer shown on device lock screen.",
+        dispatch: "Crossing cycle initiated."
+      },
+      entry: {
+        isBus: false,
+        trigger: "NFC tap at bar or ticketing counter",
+        feedback: "Companion screen pops up primary communication board (e.g., 'Ticket on app', 'Water', 'Exit').",
+        dispatch: "Counter POS terminal: 'Patron is non-verbal. Please read user display.'"
+      },
+      sos: {
+        isBus: false,
+        trigger: "Quick triple-tap on fob",
+        feedback: "Device confirms SOS broadcast silently.",
+        dispatch: "Venue Security: 'Non-verbal guest distress beacon active at Bar 2. In-person check required.'"
+      }
+    },
+    sensory: {
+      bus_ramp: {
+        isBus: true,
+        trigger: "Discreet fob button tap",
+        feedback: "Gentle silent haptic confirmation; app displays lowest-occupancy seating zone near front.",
+        dispatch: "Driver Dash: 'Sensory-sensitive patron boarding. Bus exterior beeper volume lowered for descent.'"
+      },
+      transit: {
+        isBus: false,
+        trigger: "Transit concourse beacon",
+        feedback: "Low-stimulation UI activates; routes through lowest-decibel exit corridors.",
+        dispatch: "Passive routing log."
+      },
+      crossing: {
+        isBus: false,
+        trigger: "PB/5 proximity zone",
+        feedback: "Muted gentle haptic prompt (sound muted to prevent sensory overload).",
+        dispatch: "Standard ped cycle."
+      },
+      entry: {
+        isBus: false,
+        trigger: "Fob NFC tap at venue gate",
+        feedback: "Phone displays venue quiet-zone map and chillout room access pin.",
+        dispatch: "Host Screen: 'Sensory-sensitive patron. Direct immediately to quiet zone / bypass main queue.'"
+      },
+      sos: {
+        isBus: false,
+        trigger: "De-escalation long-press",
+        feedback: "Calming visual pulse with guided breathing exercise; all device sounds muted.",
+        dispatch: "Venue Care Team: 'Patron experiencing sensory overload in main hall. Send peer escort to guide to quiet room.'"
+      }
+    }
+  };
+
+  const profileSelect = document.getElementById("profileSelect");
+  const stageSelect = document.getElementById("stageSelect");
+  const descTrigger = document.getElementById("desc-trigger");
+  const descFeedback = document.getElementById("desc-feedback");
+  const descDispatch = document.getElementById("desc-dispatch");
+  const badgeTrigger = document.getElementById("badge-trigger");
+  const badgeFeedback = document.getElementById("badge-feedback");
+  const badgeDispatch = document.getElementById("badge-dispatch");
+  const nodes = document.querySelectorAll(".node");
+  const mechanicalSpec = document.getElementById("mechanicalSpec");
+
+  function updateView() {
+    const profile = profileSelect.value;
+    const stage = stageSelect.value;
+    const data = scenarioMatrix[profile][stage];
+
+    descTrigger.textContent = data.trigger;
+    descFeedback.textContent = data.feedback;
+    descDispatch.textContent = data.dispatch;
+
+    if (data.isBus) {
+      badgeTrigger.className = "badge bus";
+      badgeFeedback.className = "badge bus";
+      badgeDispatch.className = "badge bus";
+      nodes.forEach(n => n.classList.add("bus-active"));
+      mechanicalSpec.classList.add("visible");
+    } else {
+      badgeTrigger.className = "badge";
+      badgeFeedback.className = "badge";
+      badgeDispatch.className = "badge";
+      nodes.forEach(n => n.classList.remove("bus-active"));
+      mechanicalSpec.classList.remove("visible");
+    }
+  }
+
+  // Interactive Kinematic Ramp Simulation Logic
+  let isRampDeployed = false;
+  function toggleRampSimulation() {
+    const carriage = document.getElementById("retractableCarriage");
+    const upperPlate = document.getElementById("hingedUpperPlate");
+    const stateBadge = document.getElementById("kinematicState");
+    const interlock = document.getElementById("interlockLabel");
+    const btn = document.getElementById("btnToggleRamp");
+
+    if (!isRampDeployed) {
+      // Stage 1: Electric Linear Extension
+      stateBadge.textContent = "STAGE 1: ELECTRIC ACTUATOR EXTENDING...";
+      stateBadge.style.color = "#38bdf8";
+      interlock.textContent = "CAN Bus: Throttle Inhibit Active | Air Brakes Engaged";
+      interlock.style.color = "#ef4444";
+      carriage.style.transform = "translateX(-80px)";
+
+      // Stage 2: Hydraulic Descent
+      setTimeout(() => {
+        stateBadge.textContent = "STAGE 2: HYDRAULIC ANGLE DESCENT...";
+        upperPlate.style.transform = "rotate(7.5deg)";
+      }, 700);
+
+      setTimeout(() => {
+        stateBadge.textContent = "STATE: FULLY DEPLOYED (GROUND CONFIRMED)";
+        stateBadge.style.color = "#22c55e";
+        btn.textContent = "Retract Ramp";
+        isRampDeployed = true;
+      }, 1500);
+    } else {
+      // Retraction Sequence
+      stateBadge.textContent = "RETRACTING: HYDRAULIC LIFT...";
+      upperPlate.style.transform = "rotate(0deg)";
+
+      setTimeout(() => {
+        stateBadge.textContent = "RETRACTING: LINEAR CARRIAGE STOWING...";
+        carriage.style.transform = "translateX(0px)";
+      }, 500);
+
+      setTimeout(() => {
+        stateBadge.textContent = "STATE: STOWED (IN CAVITY)";
+        stateBadge.style.color = "#f59e0b";
+        interlock.textContent = "CAN Bus: Interlock Released | Vehicle Road-Ready";
+        interlock.style.color = "#22c55e";
+        btn.textContent = "Deploy Ramp";
+        isRampDeployed = false;
+      }, 1400);
+    }
+  }
+
+  profileSelect.addEventListener("change", updateView);
+  stageSelect.addEventListener("change", updateView);
+  updateView();
+</script>
+</body>
+</html>
     .grid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 3.5rem; }
     .card { background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; }
     .card h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; letter-spacing: 0.05em; }
