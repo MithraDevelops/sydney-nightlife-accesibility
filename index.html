@@ -44,7 +44,6 @@
     .badge { display: inline-block; padding: 0.25rem 0.55rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: rgba(34, 197, 94, 0.15); color: var(--highlight); margin-bottom: 0.5rem; }
     .badge.bus { background: rgba(245, 158, 11, 0.15); color: var(--bus-accent); }
 
-    /* Mechanical Spec & Kinematic Canvas */
     .mechanical-spec { display: none; margin-top: 2rem; background: #0b1120; border: 1px solid var(--bus-accent); border-radius: 8px; padding: 1.4rem; }
     .mechanical-spec.visible { display: block; }
     .spec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.6rem; }
@@ -53,7 +52,7 @@
     .sim-controls { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
     .sim-btn { background: var(--bus-accent); color: #000; font-weight: 700; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
 
-    .ramp-canvas { width: 100%; height: 230px; background: #030712; border: 1px solid #1e293b; border-radius: 6px; overflow: hidden; margin-bottom: 1.2rem; }
+    .ramp-canvas { width: 100%; height: 240px; background: #030712; border: 1px solid #1e293b; border-radius: 6px; overflow: hidden; margin-bottom: 1.2rem; }
     svg { width: 100%; height: 100%; }
 
     .parts-legend { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; font-size: 0.75rem; }
@@ -123,10 +122,10 @@
     </div>
   </div>
 
-  <!-- Mechanical Ramp Spec & Schematic -->
+  <!-- Mechanical Ramp Spec & Kinematic Canvas -->
   <div class="mechanical-spec" id="mechanicalSpec">
     <div class="spec-header">
-      <h4>Kinematic Ramp Assembly: Pin Anchor, Retractable Hinge & Actuators</h4>
+      <h4>Continuous Trajectory: Bus Floor Doorway down to Footpath</h4>
       <span class="badge bus" id="kinematicState">STATE: STOWED IN CAVITY</span>
     </div>
 
@@ -137,60 +136,65 @@
 
     <!-- Parts Legend -->
     <div class="parts-legend">
-      <div class="part-tag"><span class="color-dot" style="background: #ef4444;"></span> 1. Fixed Pin (Chassis)</div>
+      <div class="part-tag"><span class="color-dot" style="background: #ef4444;"></span> 1. Fixed Pin (Bus Floor)</div>
       <div class="part-tag"><span class="color-dot" style="background: #a855f7;"></span> 2. Electric Actuator</div>
       <div class="part-tag"><span class="color-dot" style="background: #38bdf8;"></span> 3. Lower Slide Face</div>
       <div class="part-tag"><span class="color-dot" style="background: #f59e0b;"></span> 4. Articulating Hinge</div>
       <div class="part-tag"><span class="color-dot" style="background: #eab308;"></span> 5. Bottom Hydraulic Ram</div>
-      <div class="part-tag"><span class="color-dot" style="background: #22c55e;"></span> 6. Upper Face (1.2m Ramp)</div>
+      <div class="part-tag"><span class="color-dot" style="background: #22c55e;"></span> 6. Upper Face (1.2m Bridge)</div>
+      <div class="part-tag"><span class="color-dot" style="background: #10b981;"></span> 7. Ground Contact Tip</div>
     </div>
 
     <div class="ramp-canvas">
-      <svg viewBox="0 0 850 210" id="rampSvg">
-        <!-- Footpath / Kerb -->
-        <rect x="30" y="140" width="220" height="70" fill="#334155" />
-        <text x="45" y="170" fill="#94a3b8" font-size="12" font-weight="bold">FOOTPATH (KERB)</text>
-        <line x1="250" y1="140" x2="250" y2="210" stroke="#64748b" stroke-width="2" stroke-dasharray="4" />
+      <svg viewBox="0 0 880 220" id="rampSvg">
+        <!-- Footpath / Kerb Surface (Left) -->
+        <rect x="20" y="160" width="240" height="60" fill="#334155" />
+        <text x="35" y="190" fill="#94a3b8" font-size="12" font-weight="bold">FOOTPATH (KERB)</text>
+        <line x1="260" y1="160" x2="260" y2="220" stroke="#64748b" stroke-width="2" stroke-dasharray="4" />
 
         <!-- Road Surface Gap -->
-        <rect x="250" y="195" width="250" height="15" fill="#020617" />
-        <text x="330" y="206" fill="#475569" font-size="10">GAP SPAN: 1.2m</text>
+        <rect x="260" y="205" width="260" height="15" fill="#020617" />
+        <text x="330" y="216" fill="#475569" font-size="10">ROAD GAP SPAN: 1.2m</text>
 
-        <!-- Bus Sub-Floor Cavity & Chassis -->
-        <rect x="500" y="70" width="330" height="140" fill="#1e293b" stroke="#475569" stroke-width="2" />
-        <rect x="500" y="110" width="200" height="30" fill="#0b1120" /> <!-- Internal Cassette Housing -->
-        <text x="640" y="95" fill="#f59e0b" font-size="13" font-weight="bold">BUS DOOR (850mm CLEAR)</text>
-        <text x="640" y="175" fill="#94a3b8" font-size="11">Knelt Height: 200mm</text>
-        <text x="510" y="105" fill="#64748b" font-size="10">SUB-FLOOR CAVITY</text>
+        <!-- Bus Structure & Sub-floor Cavity (Right) -->
+        <rect x="520" y="60" width="340" height="150" fill="#1e293b" stroke="#475569" stroke-width="2" />
+        <rect x="520" y="100" width="220" height="32" fill="#0b1120" /> <!-- Stowed Cavity -->
+        <text x="660" y="85" fill="#f59e0b" font-size="13" font-weight="bold">BUS FRONT DOOR (850mm)</text>
+        <text x="660" y="160" fill="#94a3b8" font-size="11">Interior Floor Height: ~200mm</text>
+        <text x="530" y="95" fill="#64748b" font-size="10">SUB-FLOOR CAVITY</text>
 
-        <!-- 1. Fixed Pin Anchor (Chassis Frame) -->
-        <circle cx="690" cy="125" r="6" fill="#ef4444" stroke="#f8fafc" stroke-width="1.5" />
-        <text x="670" y="150" fill="#ef4444" font-size="10" font-weight="bold">[1] Fixed Pin</text>
+        <!-- [1] Fixed Pin Anchor (Bus Chassis Door Sill Mount) -->
+        <circle cx="710" cy="116" r="6.5" fill="#ef4444" stroke="#f8fafc" stroke-width="1.5" />
+        <text x="690" y="145" fill="#ef4444" font-size="10" font-weight="bold">[1] Fixed Pin</text>
 
-        <!-- 2. Electric Linear Actuator -->
-        <rect x="610" y="120" width="50" height="10" fill="#a855f7" rx="2" />
-        <line x1="690" y1="125" x2="660" y2="125" stroke="#64748b" stroke-width="3" />
-        <text x="595" y="145" fill="#a855f7" font-size="9" font-weight="bold">[2] Electric Actuator</text>
+        <!-- [2] Electric Linear Actuator (Chassis to Carriage) -->
+        <rect x="630" y="111" width="55" height="10" fill="#a855f7" rx="2" />
+        <line x1="710" y1="116" x2="685" y2="116" stroke="#64748b" stroke-width="3" />
+        <text x="615" y="140" fill="#a855f7" font-size="9" font-weight="bold">[2] Actuator</text>
 
-        <!-- Kinematic Assembly (Lower Face + Hinge + Upper Face) -->
-        <g id="retractableCarriage" transform="translate(110, 0)" style="transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);">
-          <!-- 3. Lower Face (Slide Plate) -->
-          <rect x="380" y="120" width="140" height="10" fill="#38bdf8" rx="2" />
-          <text x="445" y="114" fill="#38bdf8" font-size="9" font-weight="bold">[3] Lower Face</text>
+        <!-- Kinematic Carriage (Translates Outward, Anchored via Slide Link to Pin) -->
+        <g id="retractableCarriage" transform="translate(130, 0)" style="transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);">
+          <!-- [3] Lower Slide Face (Slides out of door cavity) -->
+          <rect x="390" y="111" width="160" height="10" fill="#38bdf8" rx="2" />
+          <text x="450" y="105" fill="#38bdf8" font-size="9" font-weight="bold">[3] Lower Slide Face</text>
 
-          <!-- 4. Articulating Pin Hinge -->
-          <circle cx="380" cy="125" r="5.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5" id="hingeJoint" />
-          <text x="360" y="102" fill="#f59e0b" font-size="10" font-weight="bold">[4] Hinge</text>
+          <!-- [4] Articulating Pin Hinge -->
+          <circle cx="390" cy="116" r="6" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5" />
+          <text x="375" y="96" fill="#f59e0b" font-size="10" font-weight="bold">[4] Hinge</text>
 
-          <!-- Hinged Upper Face Assembly -->
-          <g id="hingedUpperPlate" transform="rotate(0, 380, 125)" style="transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);">
-            <!-- 6. Upper Face (1.2m Boarding Plate) -->
-            <line x1="380" y1="125" x2="160" y2="125" stroke="#22c55e" stroke-width="7" stroke-linecap="round" />
-            <text x="240" y="116" fill="#22c55e" font-size="10" font-weight="bold">[6] Upper Face (1.2m)</text>
+          <!-- Hinged Upper Face (Pivots downward from bus door level to footpath) -->
+          <g id="hingedUpperPlate" transform="rotate(0, 390, 116)" style="transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);">
+            <!-- [6] Upper Face (Continuous 1.2m ramp plate bridging to footpath) -->
+            <line x1="390" y1="116" x2="130" y2="116" stroke="#22c55e" stroke-width="7" stroke-linecap="round" />
+            <text x="210" y="107" fill="#22c55e" font-size="10" font-weight="bold">[6] Upper Face (1.2m Continuous Ramp)</text>
 
-            <!-- 5. Bottom Hydraulic Actuator / Ram -->
-            <line x1="380" y1="131" x2="260" y2="131" stroke="#eab308" stroke-width="3.5" stroke-linecap="round" />
-            <text x="270" y="145" fill="#eab308" font-size="9" font-weight="bold">[5] Bottom Hydraulic Ram</text>
+            <!-- [5] Bottom Hydraulic Ram / Actuator Under Hinge -->
+            <line x1="390" y1="123" x2="270" y2="123" stroke="#eab308" stroke-width="3.5" stroke-linecap="round" />
+            <text x="280" y="137" fill="#eab308" font-size="9" font-weight="bold">[5] Hydraulic Ram</text>
+
+            <!-- [7] Ground Contact Tip / Pressure Sensor -->
+            <polygon points="130,113 115,119 130,119" fill="#10b981" />
+            <text x="60" y="105" fill="#10b981" font-size="9" font-weight="bold">[7] Bevelled Footpath Tip</text>
           </g>
         </g>
       </svg>
@@ -198,12 +202,12 @@
 
     <div class="spec-grid">
       <div class="spec-item">
-        <strong>Pin & Door Clearance</strong>
+        <strong>Pin & Door Margin</strong>
         <span>Door: 850mm | Ramp: 800mm (25mm margin)</span>
       </div>
       <div class="spec-item">
-        <strong>Span & Gradient</strong>
-        <span>Span: 1.2m | Rise: ~180mm (~8.5° slope)</span>
+        <strong>Continuous Trajectory</strong>
+        <span>Bus Sill (200mm) ➔ Footpath Kerb (Grounded)</span>
       </div>
       <div class="spec-item">
         <strong>Working & Dynamic Load</strong>
@@ -211,15 +215,15 @@
       </div>
       <div class="spec-item">
         <strong>Kinematic Pairing</strong>
-        <span>Chassis Pin + 24V Actuator + Hinge Ram</span>
+        <span>Fixed Pin + Linear Stroke + Hinge Ram</span>
       </div>
     </div>
     
     <p class="kinematic-status">
-      • <strong>[1] Fixed Pin Anchor:</strong> Secured to chassis under door sill; transfers 300–600kg vertical shear.<br>
-      • <strong>[2] Electric Linear Actuator:</strong> Pushes <strong>[3] Lower Face</strong> and <strong>[4] Hinge</strong> horizontally out of the sub-floor cavity.<br>
-      • <strong>[4] Retractable Hinge:</strong> Rests inside the cavity when stowed; articulates only after extending past the door sill.<br>
-      • <strong>[5] Bottom Hydraulic Ram:</strong> Pivots <strong>[6] Upper Face</strong> downward until ground sensors confirm contact with kerb.
+      • <strong>Start of Trajectory:</strong> Anchored at <strong>[1] Fixed Pin</strong> flush with interior bus doorway.<br>
+      • <strong>Stage 1 (Linear Stroke):</strong> <strong>[2] Electric Actuator</strong> slides <strong>[3] Lower Face</strong> and <strong>[4] Hinge</strong> horizontally past the door threshold.<br>
+      • <strong>Stage 2 (Angular Descent):</strong> <strong>[5] Hydraulic Ram</strong> pivots <strong>[4] Hinge</strong>, lowering <strong>[6] Upper Face</strong> continuously across the road gap until <strong>[7] Tip</strong> makes firm contact with the footpath surface.<br>
+      • <strong>Stowed Trajectory:</strong> Hydraulic ram levels the plate flat; electric actuator pulls the entire assembly back into the cavity behind the fixed pin.
     </p>
   </div>
 </div>
@@ -230,8 +234,8 @@
       bus_ramp: {
         isBus: true,
         trigger: "User presses tactile Fob or taps Bus Stop NFC pole as bus kneels",
-        feedback: "Haptic pulse + voice alert: 'Bus kneeling. Motorized 1.2m ramp extending (300kg rated). Keep clear 1.5m.'",
-        dispatch: "Bus Driver Telemetry HUD: 'Auto-Ramp deployed (800mm width / 1.2m span). Interlock active: Throttle inhibited. Ground pressure switch confirmed on footpath.'"
+        feedback: "Haptic pulse + voice alert: 'Bus kneeling. Motorized 1.2m ramp extending down to kerb (300kg rated). Keep clear 1.5m.'",
+        dispatch: "Bus Driver Telemetry HUD: 'Auto-Ramp deployed (800mm width / 1.2m span). Continuous bridge locked to footpath. Interlock: Throttle inhibited. Ground pressure switch confirmed.'"
       },
       transit: {
         isBus: false,
@@ -262,8 +266,8 @@
       bus_ramp: {
         isBus: true,
         trigger: "Exterior bus BLE beacon detected + single press on pocket fob",
-        feedback: "Bone-conduction spatial audio: 'Route 333 knelt. 1.2m ramp deployed at front 850mm door. Acoustic locator ping active at ramp tip.'",
-        dispatch: "Driver HUD: 'Visually impaired passenger boarding. Ramp deployed; keep vehicle stationary until passenger is seated.'"
+        feedback: "Bone-conduction spatial audio: 'Route 333 knelt. Continuous 1.2m ramp deployed from bus door down to footpath. Acoustic locator tone active at kerb contact tip.'",
+        dispatch: "Driver HUD: 'Visually impaired passenger boarding. Continuous ramp down on footpath; keep vehicle stationary until passenger is seated.'"
       },
       transit: {
         isBus: false,
@@ -294,7 +298,7 @@
       bus_ramp: {
         isBus: true,
         trigger: "Tap card on bus stop beacon post",
-        feedback: "High-contrast phone alert + bus exterior LED strips pulse green: 'Automated ramp extended across footpath. Safe to board.'",
+        feedback: "High-contrast phone alert + bus exterior LED strips pulse green: 'Automated ramp extended down to kerb. Safe to board.'",
         dispatch: "Driver Console: 'Deaf customer boarding via automatic ramp. Visual floor indicators lit.'"
       },
       transit: {
@@ -326,7 +330,7 @@
       bus_ramp: {
         isBus: true,
         trigger: "App quick-action button 'Board Bus with Ramp'",
-        feedback: "Screen loads destination card and confirms: 'Ramp requested. Driver notified.'",
+        feedback: "Screen loads destination card and confirms: 'Ramp requested down to footpath. Driver notified.'",
         dispatch: "Driver Console: 'Non-verbal passenger boarding via ramp. Fare destination pre-routed on terminal.'"
       },
       transit: {
@@ -423,7 +427,7 @@
     }
   }
 
-  // Kinematic Deployment Cycle (Stowed -> Linear Extension -> Hinge Pivot -> Grounded)
+  // Kinematic Cycle: Continuous bridge from bus floor sill down to footpath kerb
   let isRampDeployed = false;
   function toggleRampSimulation() {
     const carriage = document.getElementById("retractableCarriage");
@@ -433,35 +437,35 @@
     const btn = document.getElementById("btnToggleRamp");
 
     if (!isRampDeployed) {
-      // 1. Electric Actuator drives carriage & hinge out of cavity
-      stateBadge.textContent = "STAGE 1: [2] ELECTRIC ACTUATOR EXTENDING [4] HINGE...";
+      // 1. Electric Actuator drives carriage & hinge linearly out of cavity past door threshold
+      stateBadge.textContent = "STAGE 1: [2] ELECTRIC ACTUATOR EXTENDING [4] HINGE PAST SILL...";
       stateBadge.style.color = "#38bdf8";
-      interlock.textContent = "CAN Bus: Throttle Inhibited | Brakes Locked";
+      interlock.textContent = "CAN Bus: Throttle Inhibited | Air Brakes Locked";
       interlock.style.color = "#ef4444";
-      carriage.style.transform = "translateX(0px)"; // Out past door threshold
+      carriage.style.transform = "translateX(0px)"; // Out past door sill
 
-      // 2. Bottom Hydraulic Ram pivots upper face down around hinge
+      // 2. Bottom Hydraulic Ram pivots upper face down until tip rests on footpath
       setTimeout(() => {
-        stateBadge.textContent = "STAGE 2: [5] HYDRAULIC RAM ROTATING [4] HINGE DOWN...";
-        upperPlate.style.transform = "rotate(7.5deg)";
+        stateBadge.textContent = "STAGE 2: [5] HYDRAULIC RAM LOWERING [6] UPPER FACE TO KERB...";
+        upperPlate.style.transform = "rotate(9.8deg)"; // Angles down continuously to footpath
       }, 800);
 
-      // 3. Grounded
+      // 3. Fully Grounded continuous bridge
       setTimeout(() => {
-        stateBadge.textContent = "STATE: GROUNDED ON FOOTPATH (KERB CONTACT)";
+        stateBadge.textContent = "STATE: GROUNDED (CONTINUOUS BRIDGE FROM BUS TO FOOTPATH)";
         stateBadge.style.color = "#22c55e";
         btn.textContent = "Retract Ramp to Stowed Cavity";
         isRampDeployed = true;
       }, 1600);
     } else {
-      // 1. Leveling plate
+      // 1. Hydraulic lift back to horizontal
       stateBadge.textContent = "RETRACTING: [5] HYDRAULIC RAM LEVELING [6] UPPER FACE...";
       upperPlate.style.transform = "rotate(0deg)";
 
-      // 2. Pulling into cavity
+      // 2. Linear pull into cavity behind fixed pin
       setTimeout(() => {
         stateBadge.textContent = "RETRACTING: [4] HINGE STOWING IN CAVITY BEHIND [1] PIN...";
-        carriage.style.transform = "translateX(110px)"; // Fully retracted
+        carriage.style.transform = "translateX(130px)"; // Fully stowed in cavity
       }, 500);
 
       // 3. Stowed state
