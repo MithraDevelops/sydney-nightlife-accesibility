@@ -19,7 +19,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 1.5rem 1rem; display: flex; justify-content: center; min-height: 100vh; }
-    .container { max-width: 960px; width: 100%; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .container { max-width: 980px; width: 100%; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     h1 { font-size: 1.35rem; margin-bottom: 0.3rem; color: var(--accent); }
     p.subtitle { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem; }
     
@@ -44,16 +44,21 @@
     .badge { display: inline-block; padding: 0.25rem 0.55rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: rgba(34, 197, 94, 0.15); color: var(--highlight); margin-bottom: 0.5rem; }
     .badge.bus { background: rgba(245, 158, 11, 0.15); color: var(--bus-accent); }
 
-    .mechanical-spec { display: none; margin-top: 2rem; background: #0b1120; border: 1px solid var(--bus-accent); border-radius: 8px; padding: 1.2rem; }
+    /* Mechanical Spec & Kinematic Canvas */
+    .mechanical-spec { display: none; margin-top: 2rem; background: #0b1120; border: 1px solid var(--bus-accent); border-radius: 8px; padding: 1.4rem; }
     .mechanical-spec.visible { display: block; }
     .spec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.6rem; }
-    .spec-header h4 { font-size: 0.9rem; text-transform: uppercase; color: var(--bus-accent); letter-spacing: 0.05em; }
+    .spec-header h4 { font-size: 0.95rem; text-transform: uppercase; color: var(--bus-accent); letter-spacing: 0.05em; }
     
-    .sim-controls { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
-    .sim-btn { background: var(--bus-accent); color: #000; font-weight: 700; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+    .sim-controls { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .sim-btn { background: var(--bus-accent); color: #000; font-weight: 700; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
 
-    .ramp-canvas { width: 100%; height: 160px; background: #030712; border: 1px solid #1e293b; border-radius: 6px; overflow: hidden; margin-bottom: 1rem; }
+    .ramp-canvas { width: 100%; height: 230px; background: #030712; border: 1px solid #1e293b; border-radius: 6px; overflow: hidden; margin-bottom: 1.2rem; }
     svg { width: 100%; height: 100%; }
+
+    .parts-legend { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; font-size: 0.75rem; }
+    .part-tag { padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid #334155; background: #1e293b; display: flex; align-items: center; gap: 0.4rem; }
+    .color-dot { width: 8px; height: 8px; border-radius: 50%; }
 
     .spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; font-size: 0.8rem; }
     @media (max-width: 768px) { .spec-grid { grid-template-columns: 1fr 1fr; } }
@@ -118,40 +123,74 @@
     </div>
   </div>
 
+  <!-- Mechanical Ramp Spec & Schematic -->
   <div class="mechanical-spec" id="mechanicalSpec">
     <div class="spec-header">
-      <h4>Kinematic Actuation Schematic (Two-Stage Deployment)</h4>
-      <span class="badge bus" id="kinematicState">STATE: STOWED</span>
+      <h4>Kinematic Ramp Assembly: Pin Anchor, Retractable Hinge & Actuators</h4>
+      <span class="badge bus" id="kinematicState">STATE: STOWED IN CAVITY</span>
     </div>
 
     <div class="sim-controls">
-      <button class="sim-btn" id="btnToggleRamp" onclick="toggleRampSimulation()">Cycle Deployment Test</button>
-      <span id="interlockLabel" style="font-size: 0.8rem; color: #94a3b8;">Interlock Status: Ready</span>
+      <button class="sim-btn" id="btnToggleRamp" onclick="toggleRampSimulation()">Deploy Ramp (Cycle Sequence)</button>
+      <span id="interlockLabel" style="font-size: 0.8rem; color: #94a3b8;">CAN Bus: Ready | Air Brakes Disengaged</span>
+    </div>
+
+    <!-- Parts Legend -->
+    <div class="parts-legend">
+      <div class="part-tag"><span class="color-dot" style="background: #ef4444;"></span> 1. Fixed Pin (Chassis)</div>
+      <div class="part-tag"><span class="color-dot" style="background: #a855f7;"></span> 2. Electric Actuator</div>
+      <div class="part-tag"><span class="color-dot" style="background: #38bdf8;"></span> 3. Lower Slide Face</div>
+      <div class="part-tag"><span class="color-dot" style="background: #f59e0b;"></span> 4. Articulating Hinge</div>
+      <div class="part-tag"><span class="color-dot" style="background: #eab308;"></span> 5. Bottom Hydraulic Ram</div>
+      <div class="part-tag"><span class="color-dot" style="background: #22c55e;"></span> 6. Upper Face (1.2m Ramp)</div>
     </div>
 
     <div class="ramp-canvas">
-      <svg viewBox="0 0 800 180" id="rampSvg">
-        <rect x="50" y="120" width="220" height="60" fill="#334155" />
-        <text x="70" y="145" fill="#94a3b8" font-size="12" font-weight="bold">FOOTPATH (KERB)</text>
-        <line x1="270" y1="120" x2="270" y2="180" stroke="#64748b" stroke-width="2" stroke-dasharray="4" />
+      <svg viewBox="0 0 850 210" id="rampSvg">
+        <!-- Footpath / Kerb -->
+        <rect x="30" y="140" width="220" height="70" fill="#334155" />
+        <text x="45" y="170" fill="#94a3b8" font-size="12" font-weight="bold">FOOTPATH (KERB)</text>
+        <line x1="250" y1="140" x2="250" y2="210" stroke="#64748b" stroke-width="2" stroke-dasharray="4" />
 
-        <rect x="270" y="165" width="220" height="15" fill="#020617" />
-        <text x="330" y="176" fill="#475569" font-size="10">GAP SPAN: 1.2m</text>
+        <!-- Road Surface Gap -->
+        <rect x="250" y="195" width="250" height="15" fill="#020617" />
+        <text x="330" y="206" fill="#475569" font-size="10">GAP SPAN: 1.2m</text>
 
-        <rect x="490" y="70" width="300" height="110" fill="#1e293b" stroke="#475569" stroke-width="2" />
-        <rect x="490" y="90" width="130" height="18" fill="#0b1120" />
-        <text x="630" y="110" fill="#f59e0b" font-size="14" font-weight="bold">BUS FRONT DOOR (850mm)</text>
-        <text x="630" y="130" fill="#94a3b8" font-size="11">Floor Height: 200mm (Knelt)</text>
+        <!-- Bus Sub-Floor Cavity & Chassis -->
+        <rect x="500" y="70" width="330" height="140" fill="#1e293b" stroke="#475569" stroke-width="2" />
+        <rect x="500" y="110" width="200" height="30" fill="#0b1120" /> <!-- Internal Cassette Housing -->
+        <text x="640" y="95" fill="#f59e0b" font-size="13" font-weight="bold">BUS DOOR (850mm CLEAR)</text>
+        <text x="640" y="175" fill="#94a3b8" font-size="11">Knelt Height: 200mm</text>
+        <text x="510" y="105" fill="#64748b" font-size="10">SUB-FLOOR CAVITY</text>
 
-        <rect x="580" y="93" width="30" height="12" fill="#ef4444" id="elecActuator" />
-        <text x="550" y="85" fill="#ef4444" font-size="10">24V Actuator</text>
+        <!-- 1. Fixed Pin Anchor (Chassis Frame) -->
+        <circle cx="690" cy="125" r="6" fill="#ef4444" stroke="#f8fafc" stroke-width="1.5" />
+        <text x="670" y="150" fill="#ef4444" font-size="10" font-weight="bold">[1] Fixed Pin</text>
 
-        <g id="retractableCarriage" transform="translate(0, 0)" style="transition: transform 1s ease-in-out;">
-          <rect x="470" y="94" width="120" height="10" fill="#38bdf8" />
-          <circle cx="470" cy="99" r="4" fill="#f59e0b" id="hingePoint" />
-          <g id="hingedUpperPlate" transform="rotate(0, 470, 99)" style="transition: transform 0.8s ease-in-out;">
-            <line x1="470" y1="99" x2="270" y2="99" stroke="#22c55e" stroke-width="7" stroke-linecap="round" />
-            <line x1="470" y1="104" x2="370" y2="104" stroke="#f59e0b" stroke-width="3" />
+        <!-- 2. Electric Linear Actuator -->
+        <rect x="610" y="120" width="50" height="10" fill="#a855f7" rx="2" />
+        <line x1="690" y1="125" x2="660" y2="125" stroke="#64748b" stroke-width="3" />
+        <text x="595" y="145" fill="#a855f7" font-size="9" font-weight="bold">[2] Electric Actuator</text>
+
+        <!-- Kinematic Assembly (Lower Face + Hinge + Upper Face) -->
+        <g id="retractableCarriage" transform="translate(110, 0)" style="transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);">
+          <!-- 3. Lower Face (Slide Plate) -->
+          <rect x="380" y="120" width="140" height="10" fill="#38bdf8" rx="2" />
+          <text x="445" y="114" fill="#38bdf8" font-size="9" font-weight="bold">[3] Lower Face</text>
+
+          <!-- 4. Articulating Pin Hinge -->
+          <circle cx="380" cy="125" r="5.5" fill="#f59e0b" stroke="#0f172a" stroke-width="1.5" id="hingeJoint" />
+          <text x="360" y="102" fill="#f59e0b" font-size="10" font-weight="bold">[4] Hinge</text>
+
+          <!-- Hinged Upper Face Assembly -->
+          <g id="hingedUpperPlate" transform="rotate(0, 380, 125)" style="transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);">
+            <!-- 6. Upper Face (1.2m Boarding Plate) -->
+            <line x1="380" y1="125" x2="160" y2="125" stroke="#22c55e" stroke-width="7" stroke-linecap="round" />
+            <text x="240" y="116" fill="#22c55e" font-size="10" font-weight="bold">[6] Upper Face (1.2m)</text>
+
+            <!-- 5. Bottom Hydraulic Actuator / Ram -->
+            <line x1="380" y1="131" x2="260" y2="131" stroke="#eab308" stroke-width="3.5" stroke-linecap="round" />
+            <text x="270" y="145" fill="#eab308" font-size="9" font-weight="bold">[5] Bottom Hydraulic Ram</text>
           </g>
         </g>
       </svg>
@@ -159,27 +198,28 @@
 
     <div class="spec-grid">
       <div class="spec-item">
-        <strong>Clearance Geometry</strong>
-        <span>Door: 850mm | Ramp: 800mm</span>
+        <strong>Pin & Door Clearance</strong>
+        <span>Door: 850mm | Ramp: 800mm (25mm margin)</span>
       </div>
       <div class="spec-item">
         <strong>Span & Gradient</strong>
-        <span>Span: 1.2m | Rise: ~180mm (~8.5°)</span>
+        <span>Span: 1.2m | Rise: ~180mm (~8.5° slope)</span>
       </div>
       <div class="spec-item">
-        <strong>Structural Payload</strong>
-        <span>300kg (Dynamic: 420-600kg)</span>
+        <strong>Working & Dynamic Load</strong>
+        <span>300kg Rated (420–600kg dynamic @ 1.4–2.0x)</span>
       </div>
       <div class="spec-item">
-        <strong>Actuation System</strong>
-        <span>Electric Linear + Hydraulic Ram</span>
+        <strong>Kinematic Pairing</strong>
+        <span>Chassis Pin + 24V Actuator + Hinge Ram</span>
       </div>
     </div>
     
     <p class="kinematic-status">
-      • <strong>Stage 1 (Linear Stroke):</strong> 24V electric linear actuator slides the 800mm-wide cassette outward from the sub-floor cavity.<br>
-      • <strong>Stage 2 (Angular Descent):</strong> Bottom hydraulic ram articulates the hinge, lowering the 1.2m plate until ground contact is confirmed.<br>
-      • <strong>Safety Interlock:</strong> Bus kneeling active. Air brakes locked; engine throttle locked out via CAN bus.
+      • <strong>[1] Fixed Pin Anchor:</strong> Secured to chassis under door sill; transfers 300–600kg vertical shear.<br>
+      • <strong>[2] Electric Linear Actuator:</strong> Pushes <strong>[3] Lower Face</strong> and <strong>[4] Hinge</strong> horizontally out of the sub-floor cavity.<br>
+      • <strong>[4] Retractable Hinge:</strong> Rests inside the cavity when stowed; articulates only after extending past the door sill.<br>
+      • <strong>[5] Bottom Hydraulic Ram:</strong> Pivots <strong>[6] Upper Face</strong> downward until ground sensors confirm contact with kerb.
     </p>
   </div>
 </div>
@@ -383,6 +423,7 @@
     }
   }
 
+  // Kinematic Deployment Cycle (Stowed -> Linear Extension -> Hinge Pivot -> Grounded)
   let isRampDeployed = false;
   function toggleRampSimulation() {
     const carriage = document.getElementById("retractableCarriage");
@@ -392,40 +433,46 @@
     const btn = document.getElementById("btnToggleRamp");
 
     if (!isRampDeployed) {
-      stateBadge.textContent = "STAGE 1: EXTENDING...";
+      // 1. Electric Actuator drives carriage & hinge out of cavity
+      stateBadge.textContent = "STAGE 1: [2] ELECTRIC ACTUATOR EXTENDING [4] HINGE...";
       stateBadge.style.color = "#38bdf8";
-      interlock.textContent = "CAN Bus: Throttle Inhibit Active | Air Brakes Engaged";
+      interlock.textContent = "CAN Bus: Throttle Inhibited | Brakes Locked";
       interlock.style.color = "#ef4444";
-      carriage.style.transform = "translateX(-80px)";
+      carriage.style.transform = "translateX(0px)"; // Out past door threshold
 
+      // 2. Bottom Hydraulic Ram pivots upper face down around hinge
       setTimeout(() => {
-        stateBadge.textContent = "STAGE 2: HYDRAULIC DESCENT...";
+        stateBadge.textContent = "STAGE 2: [5] HYDRAULIC RAM ROTATING [4] HINGE DOWN...";
         upperPlate.style.transform = "rotate(7.5deg)";
-      }, 700);
+      }, 800);
 
+      // 3. Grounded
       setTimeout(() => {
-        stateBadge.textContent = "STATE: FULLY DEPLOYED";
+        stateBadge.textContent = "STATE: GROUNDED ON FOOTPATH (KERB CONTACT)";
         stateBadge.style.color = "#22c55e";
-        btn.textContent = "Retract Ramp";
+        btn.textContent = "Retract Ramp to Stowed Cavity";
         isRampDeployed = true;
-      }, 1400);
+      }, 1600);
     } else {
-      stateBadge.textContent = "RETRACTING: HYDRAULIC LIFT...";
+      // 1. Leveling plate
+      stateBadge.textContent = "RETRACTING: [5] HYDRAULIC RAM LEVELING [6] UPPER FACE...";
       upperPlate.style.transform = "rotate(0deg)";
 
+      // 2. Pulling into cavity
       setTimeout(() => {
-        stateBadge.textContent = "RETRACTING: STOWING...";
-        carriage.style.transform = "translateX(0px)";
+        stateBadge.textContent = "RETRACTING: [4] HINGE STOWING IN CAVITY BEHIND [1] PIN...";
+        carriage.style.transform = "translateX(110px)"; // Fully retracted
       }, 500);
 
+      // 3. Stowed state
       setTimeout(() => {
-        stateBadge.textContent = "STATE: STOWED";
+        stateBadge.textContent = "STATE: STOWED IN CAVITY";
         stateBadge.style.color = "#f59e0b";
-        interlock.textContent = "CAN Bus: Interlock Released | Vehicle Ready";
+        interlock.textContent = "CAN Bus: Interlock Cleared | Bus Road-Ready";
         interlock.style.color = "#22c55e";
-        btn.textContent = "Deploy Ramp";
+        btn.textContent = "Deploy Ramp (Cycle Sequence)";
         isRampDeployed = false;
-      }, 1300);
+      }, 1500);
     }
   }
 
